@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ApiWithWorker.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      RABBIT_HOSTNAME: "rabbitmq"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    expose:
+      - "15672"
+    volumes:
+      - "E:/Projects/Pessoais/ApiWithWorker/ApiWithWorker.Api/bin/Debug/net8.0/rabbit_files:/var/lib/rabbitmq/mnesia/"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
